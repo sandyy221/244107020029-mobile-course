@@ -1,16 +1,26 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-Dio createDio() {
+final dioProvider = Provider<Dio>((ref) {
   final dio = Dio(
     BaseOptions(
       baseUrl: 'https://jsonplaceholder.typicode.com',
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
-      headers: {'Accept': 'application/json'},
+      sendTimeout: const Duration(seconds: 10),
     ),
   );
+
+  // Interceptor Logging
   dio.interceptors.add(
-    LogInterceptor(requestBody: true, responseBody: false),
+    LogInterceptor(
+      requestHeader: true,
+      requestBody: true,
+      responseHeader: false,
+      responseBody: true,
+      error: true,
+    ),
   );
+
   return dio;
-}
+});

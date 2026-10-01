@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'paged_posts.dart';
 import 'repositories/post_repository.dart';
 import 'repositories/note_repository.dart';
+import 'prefs.dart';
+
 
 final pagedPostsNotifierProvider =
     AsyncNotifierProvider<PagedPostsNotifier, PagedPostsState>(
@@ -31,7 +33,7 @@ class PagedPostsNotifier extends AsyncNotifier<PagedPostsState> {
     } catch (e) {
       throw Exception('Terjadi kesalahan yang tidak diketahui.');
     }
-  }
+  } 
 
   // Reload / Retry dari awal
   Future<void> refresh() async {
@@ -113,15 +115,23 @@ final dirtyCountProvider = FutureProvider((ref) async {
 });
 
 // Controller untuk aksi Sync
+final prefsRepositoryProvider = Provider((ref) => PrefsRepository());
+
+class ForceOfflineNotifier extends Notifier {
+  @override
+  bool build() => false; // Nilai default awal
+
+  void toggle(bool value) {
+    state = value;
+  }
+}
+
+// Update syncControllerProvider agar memanggil syncNotes() tanpa parameter
 final syncControllerProvider = Provider((ref) {
   final repo = ref.watch(noteRepositoryProvider);
   return () async {
-    // 1. Jalankan proses syncNotes
-    final syncedCount = await repo.syncNotes(repo);
-    
-    // 2. Refresh provider badge dirty agar nilainya kembali ke 0
+    final syncedCount = await repo.syncNotes();
     ref.invalidate(dirtyCountProvider);
-    
     return syncedCount;
   };
 });

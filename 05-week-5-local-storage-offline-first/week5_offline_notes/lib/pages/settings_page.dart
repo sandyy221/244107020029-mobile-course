@@ -2,16 +2,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/prefs.dart';
 
 final prefsRepositoryProvider = Provider((ref) => PrefsRepository());
+
 final darkModeProvider =
-    AsyncNotifierProvider<DarkModeNotifier, bool>(DarkModeNotifier.new);
+    AsyncNotifierProvider(DarkModeNotifier.new);
 
-class DarkModeNotifier extends AsyncNotifier<bool> {
+class DarkModeNotifier extends AsyncNotifier {
   @override
-  Future<bool> build() =>
-      ref.watch(prefsRepositoryProvider).getDarkMode();
+  Future build() {
+    return ref.read(prefsRepositoryProvider).getDarkMode();
+  }
 
-  Future<void> toggle() async {
-    final next = !(state.value ?? false);
+  Future toggle() async {
+    final current = state.value ?? false;
+    final next = !current;
+    
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await ref.read(prefsRepositoryProvider).setDarkMode(next);

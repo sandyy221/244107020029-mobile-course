@@ -48,14 +48,14 @@ class NoteRepository {
     final db = await _openDb();
     await db.update('notes', {'dirty': 0}, where: 'dirty = 1');
   }
-  Future<int> syncNotes(NoteRepository repo) async {
-    final dirtyCount = await repo.countDirty();
-    if (dirtyCount == 0) return 0;
+  // Cukup panggil langsung tanpa parameter repo
+Future syncNotes() async {
+  final dirtyCount = await countDirty();
+  if (dirtyCount == 0) return 0;
 
-    // Simulasi delay jaringan (1 detik)
-    await Future.delayed(const Duration(seconds: 1));
-    await repo.markAllSynced();
-    
-    return dirtyCount;
-  }
+  await Future.delayed(const Duration(seconds: 1));
+  await markAllSynced();
+
+  return dirtyCount;
+}
 }

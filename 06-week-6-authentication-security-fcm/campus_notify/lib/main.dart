@@ -1,16 +1,21 @@
 // lib/main.dart
+import 'package:campus_notify/messaging/push_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:dio/dio.dart';
 
+final dio = Dio(BaseOptions(baseUrl: 'http://192.168.99.163:8000/api'));
 
-void main() {
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await initFcmToken(onToken: (token) async {
+  await dio.post('/devices', data: {'fcm_token': token, 'platform': 'android'});
+});
+  runApp(const MyApp());
 }
 
 class MyApp extends ConsumerWidget {

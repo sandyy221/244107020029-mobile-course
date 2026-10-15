@@ -1,78 +1,41 @@
-// lib/main.dart
-import 'package:campus_notify/messaging/push_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../providers/auth_provider.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:dio/dio.dart';
-
-final dio = Dio(BaseOptions(baseUrl: 'http://192.168.99.163:8000/api'));
+import 'data/api_client.dart';
+import 'data/auth_repository.dart';
+import 'data/token_store.dart';
+import 'messaging/push_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await initFcmToken(onToken: (token) async {
-  await dio.post('/devices', data: {'fcm_token': token, 'platform': 'android'});
-});
-  runApp(const MyApp());
-}
+  await initLocalNotifications();
+  await requestNotificationPermission();
 
+  final dio = buildApiClient(TokenStore(), AuthRepository());
+
+  Future<void> sendToken(String token) async {
+    try {
+      await dio.post('/devices', data: {'fcm_token': token, 'platform': 'android'});
+    } catch (e) {
+      debugPrint('Gagal kirim token ke backend: $e');
+    }
+  }
+
+  await initFcmToken(onToken: sendToken);
+
+  runApp(const ProviderScope(child: MyApp()));
+}
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 2. Buat GoRouter di dalam build method supaya bisa mendengarkan perubahan Riverpod
-    final goRouter = GoRouter(
-      redirect: (context, state) {
-        // Membaca status login dari authStateProvider
-        final loggedIn = ref.read(authStateProvider).value ?? false;
-        final goingLogin = state.matchedLocation == '/login';
-        
-        if (!loggedIn && !goingLogin) return '/login';
-        if (loggedIn && goingLogin) return '/';
-        return null;
-      },
-      routes: [
-        GoRoute(
-          path: '/login', 
-          builder: (_, __) => const LoginPage(),
-        ),
-        GoRoute(
-          path: '/', 
-          builder: (_, __) => const HomePage(),
-        ),
-        GoRoute(
-          path: '/pengumuman/:id',
-          builder: (_, s) => AnnouncementPage(id: s.pathParameters['id'] ?? ''),
-        ),
-      ],
-    );
-
-    return MaterialApp.router(
-      title: 'Aplikasi Guard Route',
-      routerConfig: goRouter,
+    return MaterialApp(
+      title: 'Campus Notify',
+      home: const Scaffold(
+        body: Center(child: Text('Campus Notify')),
+      ),
     );
   }
-}
-
-// --- Dummy Pages (Pindahkan ke file terpisah nantinya) ---
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Login Page')));
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Home Page')));
-}
-
-class AnnouncementPage extends StatelessWidget {
-  final String id;
-  const AnnouncementPage({super.key, required this.id});
-  @override
-  Widget build(BuildContext context) => Scaffold(body: Center(child: Text('Pengumuman ID: $id')));
 }

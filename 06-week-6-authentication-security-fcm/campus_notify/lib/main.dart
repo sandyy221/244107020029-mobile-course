@@ -1,4 +1,5 @@
 import 'package:campus_notify/messaging/push_service.dart';
+import 'package:campus_notify/routes.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -10,9 +11,9 @@ final dio = Dio(BaseOptions(baseUrl: 'https://example-campus-api.test'));
 
 final router = GoRouter(
   routes: [
-    GoRoute(path: '/', builder: (_, __) => const HomePage()),
+    GoRoute(path: AppRoutes.home, builder: (_, __) => const HomePage()),
     GoRoute(
-      path: '/pengumuman/:id',
+      path: AppRoutes.pengumumanDetail,
       builder: (_, s) => AnnouncementPage(id: s.pathParameters['id'] ?? ''),
     ),
   ],
@@ -98,7 +99,7 @@ class _HomePageState extends State<HomePage> {
             Text('FCM token: $_token'),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => context.go('/pengumuman/3'),
+              onPressed: () => context.go(AppRoutes.pengumumanDetailWithId('3')),
               child: const Text('Buka pengumuman 3'),
             ),
           ],

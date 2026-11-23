@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod/src/framework.dart';
+
 import 'pages/notes_page.dart';
 import 'pages/settings_page.dart';
+
 void main() {
   runApp(
     // Wajib ada ProviderScope agar Riverpod bisa berjalan
-    const ProviderScope(
-      child: MyApp(),
-    ),
-    
+    const ProviderScope(child: MyApp()),
   );
 }
 
@@ -33,7 +31,7 @@ class MyApp extends ConsumerWidget {
       loading: () => const MaterialApp(
         home: Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
-      error: (_, __) => MaterialApp(
+      error: (_, _) => MaterialApp(
         theme: ThemeData.light(useMaterial3: true),
         home: const NotesPage(),
       ),

@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        working-directory: 05-week-5-local-storage-offline-first/week5_offline_notes
+        run: flutter pub get
+
+      - name: Check Formatting
+        working-directory: 05-week-5-local-storage-offline-first/week5_offline_notes
+        run: dart format --set-exit-if-changed .
+
+      - name: Static Analysis
+        working-directory: 05-week-5-local-storage-offline-first/week5_offline_notes
+        run: flutter analyze
+
+      - name: Run Tests
+        working-directory: 05-week-5-local-storage-offline-first/week5_offline_notes
+        run: flutter test

@@ -1,30 +1,37 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:week5_offline_notes/main.dart';
+import 'package:week5_offline_notes/core/validate.dart';
+import 'package:week5_offline_notes/data/providers.dart';
+import 'package:week5_offline_notes/pages/notes_page.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Smoke test verifikasi UI NotesPage dan validator catatan', (
+    WidgetTester tester,
+  ) async {
+    // Verifikasi logika validator
+    expect(NoteValidator.validateTitle(''), 'Judul tidak boleh kosong');
+    expect(NoteValidator.validateTitle('Catatan Penting'), isNull);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Build widget dengan ProviderScope dan override provider async
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          notesListProvider.overrideWith((ref) async => []),
+          dirtyCountProvider.overrideWith((ref) async => 0),
+        ],
+        child: const MaterialApp(home: NotesPage()),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Pastikan halaman NotesPage ter-render dengan judul dan tombol add
+    expect(find.text('Catatan Offline'), findsOneWidget);
+    expect(find.byIcon(Icons.add), findsOneWidget);
+    expect(
+      find.text('Belum ada catatan. Klik + untuk membuat.'),
+      findsOneWidget,
+    );
   });
 }

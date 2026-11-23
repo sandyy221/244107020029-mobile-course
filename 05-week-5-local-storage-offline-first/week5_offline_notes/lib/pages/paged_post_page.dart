@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/providers.dart';
 
+import '../data/providers.dart';
 
 class PagedPostPage extends ConsumerStatefulWidget {
   const PagedPostPage({super.key});
@@ -37,9 +37,7 @@ class _PagedPostPageState extends ConsumerState<PagedPostPage> {
     final stateAsync = ref.watch(pagedPostsNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Infinite Scroll Posts'),
-      ),
+      appBar: AppBar(title: const Text('Infinite Scroll Posts')),
       body: stateAsync.when(
         // 1. STATE LOADING (Pertama kali)
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -59,9 +57,8 @@ class _PagedPostPageState extends ConsumerState<PagedPostPage> {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () => ref
-                      .read(pagedPostsNotifierProvider.notifier)
-                      .refresh(),
+                  onPressed: () =>
+                      ref.read(pagedPostsNotifierProvider.notifier).refresh(),
                   child: const Text('Coba Lagi (Retry)'),
                 ),
               ],
@@ -79,9 +76,8 @@ class _PagedPostPageState extends ConsumerState<PagedPostPage> {
                 children: [
                   const Text('Tidak ada data postingan ditemukan.'),
                   ElevatedButton(
-                    onPressed: () => ref
-                        .read(pagedPostsNotifierProvider.notifier)
-                        .refresh(),
+                    onPressed: () =>
+                        ref.read(pagedPostsNotifierProvider.notifier).refresh(),
                     child: const Text('Refresh'),
                   ),
                 ],
@@ -100,8 +96,10 @@ class _PagedPostPageState extends ConsumerState<PagedPostPage> {
                 if (index < pagedState.items.length) {
                   final post = pagedState.items[index];
                   return Card(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     child: ListTile(
                       leading: CircleAvatar(child: Text('${post.id}')),
                       title: Text(

@@ -1,15 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'paged_posts.dart';
 import 'repositories/post_repository.dart';
 import 'repositories/note_repository.dart';
 import 'prefs.dart';
 
-
 final pagedPostsNotifierProvider =
     AsyncNotifierProvider<PagedPostsNotifier, PagedPostsState>(
-  PagedPostsNotifier.new,
-);
+      PagedPostsNotifier.new,
+    );
 
 class PagedPostsNotifier extends AsyncNotifier<PagedPostsState> {
   static const int _limit = 10;
@@ -33,7 +33,7 @@ class PagedPostsNotifier extends AsyncNotifier<PagedPostsState> {
     } catch (e) {
       throw Exception('Terjadi kesalahan yang tidak diketahui.');
     }
-  } 
+  }
 
   // Reload / Retry dari awal
   Future<void> refresh() async {
@@ -59,7 +59,7 @@ class PagedPostsNotifier extends AsyncNotifier<PagedPostsState> {
 
     try {
       final newPosts = await repo.fetchPosts(page: nextPage, limit: _limit);
-      
+
       state = AsyncValue.data(
         currentData.copyWith(
           items: [...currentData.items, ...newPosts],
@@ -86,7 +86,6 @@ class PagedPostsNotifier extends AsyncNotifier<PagedPostsState> {
   }
 }
 
-
 // Helper pemetaan error
 String mapDioErrorToMessage(DioException error) {
   switch (error.type) {
@@ -104,8 +103,8 @@ String mapDioErrorToMessage(DioException error) {
     default:
       return 'Terjadi kesalahan koneksi jaringan.';
   }
-  
 }
+
 final noteRepositoryProvider = Provider((ref) => NoteRepository());
 
 // Provider untuk Badge Dirty Count

@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../api_client.dart';
 import '../models/post.dart';
 import '../local/db.dart';
+
 import 'dart:convert';
 
 final postRepositoryProvider = Provider<PostRepository>((ref) {
@@ -18,10 +20,7 @@ class PostRepository {
     try {
       final response = await _dio.get(
         '/posts',
-        queryParameters: {
-          '_page': page,
-          '_limit': limit,
-        },
+        queryParameters: {'_page': page, '_limit': limit},
       );
 
       final List data = response.data as List;
@@ -30,26 +29,30 @@ class PostRepository {
       rethrow;
     }
   }
+
   Future<List<Post>> readCachedPosts() async {
     final db = await openNotesDb();
     final maps = await db.query('cached_posts');
-    
+
     return maps.map((row) {
       final jsonMap = jsonDecode(row['payload'] as String);
       return Post.fromJson(jsonMap);
     }).toList();
   }
+
   Future<void> refreshPostsInBackground() async {
     try {
-      final response = await _dio.get('https://jsonplaceholder.typicode.com/posts');
+      final response = await _dio.get(
+        'https://jsonplaceholder.typicode.com/posts',
+      );
       final List data = response.data;
 
       final db = await openNotesDb();
       final batch = db.batch();
-      
+
       // Bersihkan cache lama
       batch.delete('cached_posts');
-      
+
       final now = DateTime.now().toIso8601String();
       for (var item in data) {
         batch.insert('cached_posts', {

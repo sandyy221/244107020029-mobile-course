@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'pages/notes_page.dart';
+import 'pages/search_notes_page.dart';
 import 'pages/settings_page.dart';
 
 void main() {
@@ -26,14 +26,14 @@ class MyApp extends ConsumerWidget {
         themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
         theme: ThemeData.light(useMaterial3: true),
         darkTheme: ThemeData.dark(useMaterial3: true),
-        home: const NotesPage(),
+        home: const SearchNotesPage(),
       ),
       loading: () => const MaterialApp(
         home: Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
       error: (_, _) => MaterialApp(
         theme: ThemeData.light(useMaterial3: true),
-        home: const NotesPage(),
+        home: const SearchNotesPage(),
       ),
     );
   }

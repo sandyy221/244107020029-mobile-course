@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/providers.dart';
 import '../presentation/notes_search_notifier.dart';
+import 'ai_chat_page.dart';
 
 /// Halaman catatan offline dengan fitur pencarian (Week 9 AI-Assisted).
 /// Menggantikan [NotesPage] versi lama sebagai halaman utama.
@@ -90,6 +91,17 @@ class _SearchNotesPageState extends ConsumerState<SearchNotesPage> {
       appBar: AppBar(
         title: const Text('Catatan Offline'),
         actions: [
+          // Tombol Buka Asisten AI (Week 10)
+          IconButton(
+            icon: const Icon(Icons.auto_awesome, color: Colors.amber),
+            tooltip: 'Tanya Asisten AI',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AiChatPage()),
+              );
+            },
+          ),
           // Badge dirty/synced
           Padding(
             padding: const EdgeInsets.only(right: 4),

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../ai/ai_service.dart';
+import 'ai/ai_service.dart';
 
 /// Provider singleton untuk instance [AiService].
 final aiServiceProvider = Provider<AiService>((ref) {

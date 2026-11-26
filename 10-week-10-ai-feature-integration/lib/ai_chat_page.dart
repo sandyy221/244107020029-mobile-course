@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../ai/ai_service.dart';
-import '../presentation/ai_chat_notifier.dart';
+import 'ai/ai_service.dart';
+import 'ai_chat_notifier.dart';
 
 /// Halaman antarmuka obrolan cerdas berbasis AI (Week 10 AI Feature Integration).
 class AiChatPage extends ConsumerStatefulWidget {

@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/models/post.dart';
 import '../data/providers.dart';
 
+/// Halaman infinite scroll posts dengan optimasi performa (Week 11).
+///
+/// Optimasi yang diterapkan:
+/// 1. Ekstraksi kartu list ke dalam widget tersendiri ([PostItemCard]) dengan `const` styling.
+/// 2. Isolasi render painting dengan [RepaintBoundary] pada tiap item feed.
+/// 3. Lazy loading viewport dan controller lifecycle yang bersih.
 class PagedPostPage extends ConsumerStatefulWidget {
   const PagedPostPage({super.key});
 
@@ -95,25 +102,9 @@ class _PagedPostPageState extends ConsumerState<PagedPostPage> {
               itemBuilder: (context, index) {
                 if (index < pagedState.items.length) {
                   final post = pagedState.items[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(child: Text('${post.id}')),
-                      title: Text(
-                        post.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        post.body,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                  // Isolasi paint layer pada setiap post card
+                  return RepaintBoundary(
+                    child: PostItemCard(key: ValueKey(post.id), post: post),
                   );
                 } else {
                   // Bottom Loader untuk Pagination / Bottom Error
@@ -137,6 +128,30 @@ class _PagedPostPageState extends ConsumerState<PagedPostPage> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// Item post feed yang dioptimasi dengan ekstraksi widget mandiri.
+class PostItemCard extends StatelessWidget {
+  final Post post;
+
+  const PostItemCard({super.key, required this.post});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: ListTile(
+        leading: CircleAvatar(child: Text('${post.id}')),
+        title: Text(
+          post.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(post.body, maxLines: 2, overflow: TextOverflow.ellipsis),
       ),
     );
   }

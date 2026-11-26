@@ -1,10 +1,22 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'pages/search_notes_page.dart';
 import 'pages/settings_page.dart';
 
 void main() {
+  // Inisialisasi sqflite_common_ffi untuk platform Desktop (Windows/Linux/macOS)
+  // agar SQLite dapat berjalan di luar Android/iOS.
+  if (!kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.linux ||
+          defaultTargetPlatform == TargetPlatform.macOS)) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+
   runApp(
     // Wajib ada ProviderScope agar Riverpod bisa berjalan
     const ProviderScope(child: MyApp()),
